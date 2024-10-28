@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.QiandaoDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.yuyue_id as yuyueId
+        ,a.qiandao_name as qiandaoName
+        ,a.qiandao_time as qiandaoTime
+        ,a.qiantui_time as qiantuiTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.QiandaoView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,yuyue.shiyanshi_id as shiyanshiId
+        ,yuyue.jiaoshi_id as jiaoshiId
+        ,yuyue.banji_id as banjiId
+        ,yuyue.yuyue_time as yuyueTime
+        ,yuyue.yuyue_name as yuyueName
+        ,yuyue.yuyue_types as yuyueTypes
+        ,yuyue.yuyue_yingdao as yuyueYingdao
+        ,yuyue.yuyue_yidao as yuyueYidao
+
+        FROM qiandao  a
+        left JOIN yuyue yuyue ON a.yuyue_id = yuyue.id
+
+        <where>
+            <if test="params.yuyueId != null">
+                and a.yuyue_id = #{params.yuyueId}
+            </if>
+            <if test=" params.qiandaoName != '' and params.qiandaoName != null and params.qiandaoName != 'null' ">
+                and a.qiandao_name like CONCAT('%',#{params.qiandaoName},'%')
+            </if>
+            <if test=" params.qiandaoTimeStart != '' and params.qiandaoTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.qiandao_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.qiandaoTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.qiandaoTimeEnd != '' and params.qiandaoTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.qiandao_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.qiandaoTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+            <if test=" params.qiantuiTimeStart != '' and params.qiantuiTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.qiantui_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.qiantuiTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.qiantuiTimeEnd != '' and params.qiantuiTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.qiantui_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.qiantuiTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+
+            <if test="params.shiyanshiId != null">
+                and yuyue.shiyanshi_id = #{params.shiyanshiId}
+            </if>
+            <if test="params.jiaoshiId != null">
+                and yuyue.jiaoshi_id = #{params.jiaoshiId}
+            </if>
+            <if test="params.banjiId != null">
+                and yuyue.banji_id = #{params.banjiId}
+            </if>
+            <if test=" params.yuyueTimeStart != '' and params.yuyueTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(yuyue.yuyue_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.yuyueTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.yuyueTimeEnd != '' and params.yuyueTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(yuyue.yuyue_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.yuyueTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+            <if test=" params.yuyueName != '' and params.yuyueName != null and params.yuyueName != 'null' ">
+                and yuyue.yuyue_name like CONCAT('%',#{params.yuyueName},'%')
+            </if>
+            <if test="params.yuyueTypes != null">
+                and yuyue.yuyue_types = #{params.yuyueTypes}
+            </if>
+
+            <if test="params.yuyueYingdaoStart != null ">
+                <![CDATA[  and yuyue.yuyue_yingdao >= #{params.yuyueYingdaoStart}   ]]>
+            </if>
+            <if test="params.yuyueYingdaoEnd != null ">
+                <![CDATA[  and yuyue.yuyue_yingdao <= #{params.yuyueYingdaoEnd}   ]]>
+            </if>
+            <if test="params.yuyueYidaoStart != null ">
+                <![CDATA[  and yuyue.yuyue_yidao >= #{params.yuyueYidaoStart}   ]]>
+            </if>
+            <if test="params.yuyueYidaoEnd != null ">
+                <![CDATA[  and yuyue.yuyue_yidao <= #{params.yuyueYidaoEnd}   ]]>
+            </if>
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>

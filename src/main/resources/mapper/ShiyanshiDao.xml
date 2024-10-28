@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ShiyanshiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.shiyanshi_name as shiyanshiName
+        ,a.shiyanshi_weizhi as shiyanshiWeizhi
+        ,a.shiyanshi_photo as shiyanshiPhoto
+        ,a.shiyanshi_content as shiyanshiContent
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ShiyanshiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM shiyanshi  a
+
+        <where>
+            <if test=" params.shiyanshiName != '' and params.shiyanshiName != null and params.shiyanshiName != 'null' ">
+                and a.shiyanshi_name like CONCAT('%',#{params.shiyanshiName},'%')
+            </if>
+            <if test=" params.shiyanshiWeizhi != '' and params.shiyanshiWeizhi != null and params.shiyanshiWeizhi != 'null' ">
+                and a.shiyanshi_weizhi like CONCAT('%',#{params.shiyanshiWeizhi},'%')
+            </if>
+            <if test=" params.shiyanshiContent != '' and params.shiyanshiContent != null and params.shiyanshiContent != 'null' ">
+                and a.shiyanshi_content like CONCAT('%',#{params.shiyanshiContent},'%')
+            </if>
+
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>

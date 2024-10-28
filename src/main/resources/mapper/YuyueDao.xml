@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.YuyueDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.shiyanshi_id as shiyanshiId
+        ,a.jiaoshi_id as jiaoshiId
+        ,a.banji_id as banjiId
+        ,a.yuyue_time as yuyueTime
+        ,a.yuyue_name as yuyueName
+        ,a.yuyue_types as yuyueTypes
+        ,a.yuyue_yingdao as yuyueYingdao
+        ,a.yuyue_yidao as yuyueYidao
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.YuyueView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,banji.banji_name as banjiName
+        ,banji.banji_number as banjiNumber
+        ,jiaoshi.jiaoshi_name as jiaoshiName
+        ,jiaoshi.sex_types as sexTypes
+        ,jiaoshi.jiaoshi_id_number as jiaoshiIdNumber
+        ,jiaoshi.jiaoshi_phone as jiaoshiPhone
+        ,jiaoshi.jiaoshi_photo as jiaoshiPhoto
+        ,shiyanshi.shiyanshi_name as shiyanshiName
+        ,shiyanshi.shiyanshi_weizhi as shiyanshiWeizhi
+        ,shiyanshi.shiyanshi_photo as shiyanshiPhoto
+        ,shiyanshi.shiyanshi_content as shiyanshiContent
+
+        FROM yuyue  a
+        left JOIN banji banji ON a.banji_id = banji.id
+        left JOIN jiaoshi jiaoshi ON a.jiaoshi_id = jiaoshi.id
+        left JOIN shiyanshi shiyanshi ON a.shiyanshi_id = shiyanshi.id
+
+        <where>
+            <if test="params.shiyanshiId != null">
+                and a.shiyanshi_id = #{params.shiyanshiId}
+            </if>
+            <if test="params.jiaoshiId != null">
+                and a.jiaoshi_id = #{params.jiaoshiId}
+            </if>
+            <if test="params.banjiId != null">
+                and a.banji_id = #{params.banjiId}
+            </if>
+            <if test=" params.yuyueTimeStart != '' and params.yuyueTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.yuyue_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.yuyueTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.yuyueTimeEnd != '' and params.yuyueTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.yuyue_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.yuyueTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+            <if test=" params.yuyueName != '' and params.yuyueName != null and params.yuyueName != 'null' ">
+                and a.yuyue_name like CONCAT('%',#{params.yuyueName},'%')
+            </if>
+            <if test="params.yuyueTypes != null">
+                and a.yuyue_types = #{params.yuyueTypes}
+            </if>
+            <if test="params.yuyueYingdaoStart != null">
+                <![CDATA[  and a.yuyue_yingdao >= #{params.yuyueYingdaoStart}   ]]>
+            </if>
+            <if test="params.yuyueYingdaoEnd != null">
+                <![CDATA[  and a.yuyue_yingdao <= #{params.yuyueYingdaoEnd}   ]]>
+            </if>
+            <if test="params.yuyueYidaoStart != null">
+                <![CDATA[  and a.yuyue_yidao >= #{params.yuyueYidaoStart}   ]]>
+            </if>
+            <if test="params.yuyueYidaoEnd != null">
+                <![CDATA[  and a.yuyue_yidao <= #{params.yuyueYidaoEnd}   ]]>
+            </if>
+
+            <if test=" params.banjiName != '' and params.banjiName != null and params.banjiName != 'null' ">
+                and banji.banji_name like CONCAT('%',#{params.banjiName},'%')
+            </if>
+            <if test="params.banjiNumberStart != null ">
+                <![CDATA[  and banji.banji_number >= #{params.banjiNumberStart}   ]]>
+            </if>
+            <if test="params.banjiNumberEnd != null ">
+                <![CDATA[  and banji.banji_number <= #{params.banjiNumberEnd}   ]]>
+            </if>
+            <if test=" params.jiaoshiName != '' and params.jiaoshiName != null and params.jiaoshiName != 'null' ">
+                and jiaoshi.jiaoshi_name like CONCAT('%',#{params.jiaoshiName},'%')
+            </if>
+            <if test="params.sexTypes != null">
+                and jiaoshi.sex_types = #{params.sexTypes}
+            </if>
+
+            <if test=" params.jiaoshiIdNumber != '' and params.jiaoshiIdNumber != null and params.jiaoshiIdNumber != 'null' ">
+                and jiaoshi.jiaoshi_id_number like CONCAT('%',#{params.jiaoshiIdNumber},'%')
+            </if>
+            <if test=" params.jiaoshiPhone != '' and params.jiaoshiPhone != null and params.jiaoshiPhone != 'null' ">
+                and jiaoshi.jiaoshi_phone like CONCAT('%',#{params.jiaoshiPhone},'%')
+            </if>
+            <if test=" params.shiyanshiName != '' and params.shiyanshiName != null and params.shiyanshiName != 'null' ">
+                and shiyanshi.shiyanshi_name like CONCAT('%',#{params.shiyanshiName},'%')
+            </if>
+            <if test=" params.shiyanshiWeizhi != '' and params.shiyanshiWeizhi != null and params.shiyanshiWeizhi != 'null' ">
+                and shiyanshi.shiyanshi_weizhi like CONCAT('%',#{params.shiyanshiWeizhi},'%')
+            </if>
+            <if test=" params.shiyanshiContent != '' and params.shiyanshiContent != null and params.shiyanshiContent != 'null' ">
+                and shiyanshi.shiyanshi_content like CONCAT('%',#{params.shiyanshiContent},'%')
+            </if>
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>
